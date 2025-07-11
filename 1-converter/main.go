@@ -29,5 +29,5 @@ func getUserInputData() (string, float64, string) {
 }
 
 func calculate(from string, amount float64, to string) float64 {
-
+	return 0.0
 }
