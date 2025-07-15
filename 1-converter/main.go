@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -21,7 +22,12 @@ func main() {
 
 	from, amount, to := getUserInputData()
 
-	fmt.Printf("В результате конверсии Вы получите %.2f %s.", calculate(from, amount, to), to)
+	result, err := calculate(from, amount, to)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("В результате конверсии Вы получите %.2f %s.", result, to)
 
 }
 
@@ -130,7 +136,11 @@ func getCurrencyString(currencyMap *map[string]bool) string {
 }
 
 // qwe
-func calculate(from string, amount float64, to string) float64 {
+func calculate(from string, amount float64, to string) (float64, error) {
+	if from == to {
+		return 0, errors.New("Валюты конвертации одинаковые")
+	}
+
 	var coeff float64
 
 	switch from {
