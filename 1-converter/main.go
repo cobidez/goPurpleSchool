@@ -138,10 +138,11 @@ func getCurrencyString(currencyMap *map[string]bool) string {
 // qwe
 func calculate(from string, amount float64, to string) (float64, error) {
 	if from == to {
-		return 0, errors.New("Валюты конвертации одинаковые")
+		return amount, errors.New("Валюты конвертации одинаковые")
 	}
 
 	var coeff float64
+	var is_default bool = false
 
 	switch from {
 	case "eur":
@@ -150,6 +151,9 @@ func calculate(from string, amount float64, to string) (float64, error) {
 			coeff = EurInRub
 		case "usd":
 			coeff = EurInUsd
+		default:
+			coeff = 1
+			is_default = true
 		}
 
 	case "usd":
@@ -158,6 +162,9 @@ func calculate(from string, amount float64, to string) (float64, error) {
 			coeff = 1 / RubInUsd
 		case "eur":
 			coeff = 1 / EurInUsd
+		default:
+			coeff = 1
+			is_default = true
 		}
 
 	case "rub":
@@ -166,9 +173,20 @@ func calculate(from string, amount float64, to string) (float64, error) {
 			coeff = RubInUsd
 		case "eur":
 			coeff = 1 / EurInRub
+		default:
+			coeff = 1
+			is_default = true
 		}
+
+	default:
+		coeff = 1
+		is_default = true
 	}
 
-	return amount * coeff
+	var err error
+	if is_default {
+		err = errors.New("не найдена валюта. коэффициент стал равен 1")
+	}
+	return amount * coeff, err
 
 }
