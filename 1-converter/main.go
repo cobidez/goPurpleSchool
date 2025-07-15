@@ -54,12 +54,15 @@ func getUserInputData() (string, float64, string) {
 
 // 123
 func getExceptCurrenciesMap(baseMap *map[string]bool, exceptMap *map[string]bool) *map[string]bool {
-	if baseMap == nil || exceptMap == nil {
-		return baseMap
-	}
-
-	// Создаем новый слайс и кладем в него значения
 	result := make(map[string]bool)
+
+	if baseMap == nil || exceptMap == nil {
+		for k, v := range *baseMap {
+			result[k] = v
+		}
+
+		return &result
+	}
 
 	for k := range *baseMap {
 		if _, is_exists := (*exceptMap)[k]; !is_exists {
@@ -138,7 +141,7 @@ func getCurrencyString(currencyMap *map[string]bool) string {
 // qwe
 func calculate(from string, amount float64, to string) (float64, error) {
 	if from == to {
-		return amount, errors.New("Валюты конвертации одинаковые")
+		return amount, errors.New("валюты конвертации одинаковые")
 	}
 
 	var coeff float64
