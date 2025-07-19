@@ -40,13 +40,11 @@ func getUserInputData() (string, float64, string) {
 	)
 
 	listOfCurrencies := getExceptCurrenciesMap(availableCurrenciesMap, nil)
-
 	from = getUserCurrencyInput("Введите валюту, из которой Вы хотите конвертировать(%s): ", listOfCurrencies)
 
 	amount = getUserAmountInput("Введите сумму конвертации: ")
 
 	listOfCurrencies = getExceptCurrenciesMap(availableCurrenciesMap, &map[string]bool{from: true})
-
 	to = getUserCurrencyInput("Введите валюту, в которую Вы хотите конвертировать(%s): ", listOfCurrencies)
 
 	return from, amount, to
