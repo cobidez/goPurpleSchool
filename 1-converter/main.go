@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+type toCurrencyMap = map[string]float64
+type fromCurrencyMap = map[string]toCurrencyMap
+
 var availableCurrenciesMap *map[string]bool = &map[string]bool{
 	"eur": true,
 	"usd": true,
@@ -31,7 +34,6 @@ func main() {
 
 }
 
-// qwe
 func getUserInputData() (string, float64, string) {
 	var (
 		from   string
@@ -145,49 +147,43 @@ func calculate(from string, amount float64, to string) (float64, error) {
 	var coeff float64
 	var is_default bool = false
 
-	switch from {
-	case "eur":
-		switch to {
-		case "rub":
-			coeff = EurInRub
-		case "usd":
-			coeff = EurInUsd
-		default:
-			coeff = 1
+	currencyMap := getFullCurrencyMap()
+
+	if valFrom, existsFrom := (*currencyMap)[from]; existsFrom {
+
+		if valTo, existsTo := valFrom[to]; existsTo {
+			coeff = valTo
+		} else {
 			is_default = true
 		}
 
-	case "usd":
-		switch to {
-		case "rub":
-			coeff = 1 / RubInUsd
-		case "eur":
-			coeff = 1 / EurInUsd
-		default:
-			coeff = 1
-			is_default = true
-		}
-
-	case "rub":
-		switch to {
-		case "usd":
-			coeff = RubInUsd
-		case "eur":
-			coeff = 1 / EurInRub
-		default:
-			coeff = 1
-			is_default = true
-		}
-
-	default:
-		coeff = 1
+	} else {
 		is_default = true
 	}
 
 	var err error
 	if is_default {
 		err = errors.New("не найдена валюта. коэффициент стал равен 1")
+		coeff = 1
 	}
 	return amount * coeff, err
+}
 
+func getFullCurrencyMap() *fromCurrencyMap {
+	result := fromCurrencyMap{
+		"usd": toCurrencyMap{
+			"eur": 1 / RubInUsd,
+			"rub": 1 / EurInUsd,
+		},
+		"eur": toCurrencyMap{
+			"usd": EurInUsd,
+			"rub": EurInRub,
+		},
+		"rub": toCurrencyMap{
+			"usd": RubInUsd,
+			"eur": 1 / EurInRub,
+		},
+	}
+
+	return &result
 }
