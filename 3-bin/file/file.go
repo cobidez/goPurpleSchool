@@ -40,5 +40,6 @@ func ReadFile(name string, path string) ([]byte, error) {
 
 func IsJsonFile(file []byte) bool {
 	var result any
-	return json.Unmarshal(file, result) == nil
+	err := json.Unmarshal(file, &result)
+	return err == nil
 }
