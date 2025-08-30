@@ -7,6 +7,19 @@ import (
 	"time"
 )
 
+type Reader interface {
+	Read() (BinList, error)
+}
+
+type Writer interface {
+	Write(BinList) error
+}
+
+type ReadWriter interface {
+	Reader
+	Writer
+}
+
 type Bin struct {
 	Id        string    `json:"id"`
 	Private   bool      `json:"private"`
