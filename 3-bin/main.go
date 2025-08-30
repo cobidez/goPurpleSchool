@@ -2,16 +2,17 @@ package main
 
 import (
 	"bin/file"
+	"bin/storage"
 	"fmt"
 )
 
 func main() {
-	data, err := file.ReadFile("bins.json", "bins/")
 
+	storageAccess := storage.NewStorage(file.NewFileStorageWithDefault())
+	list, err := storageAccess.ReadBinList()
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println(file.IsJsonFile(data))
+	fmt.Println(list)
 
 }
