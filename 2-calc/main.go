@@ -7,37 +7,25 @@ import (
 	"strings"
 )
 
-type modeMapObject struct {
-	mode       byte
-	calcObject mathCalcInterfacre
-}
-
-const (
-	avgMode byte = iota
-	sumMode
-	medMode
-)
-
 var (
-	inputModeMap    *map[string]modeMapObject = getInputModeMap()
-	inputModeString string                    = getInputModeString()
+	inputModeFnMap = map[string]func(*[]int) int{
+		"AVG": calcAvg,
+		"SUM": calcSum,
+		"MED": calcMed,
+	}
+
+	inputModeString string = getInputModeString()
 )
 
-type mathCalcInterfacre interface {
-	calc(*[]int) int
+func makeCalc(fn func(*[]int) int, slice *[]int) int {
+	return fn(slice)
 }
-
-type sumCalc struct{}
-type avgCalc struct{}
-type medCalc struct{}
 
 func main() {
 	mode := getUserMode()
 	numberSlice := getUserNumberData()
 
-	calcObject := (*inputModeMap)[mode].calcObject
-
-	result := calcObject.calc(numberSlice)
+	result := makeCalc(inputModeFnMap[mode], numberSlice)
 
 	fmt.Printf("Результат операции %s равен %d", mode, result)
 }
@@ -59,7 +47,7 @@ func getUserMode() string {
 }
 
 func isModeInputOk(input string) bool {
-	for k := range *inputModeMap {
+	for k := range inputModeFnMap {
 		if strings.ToUpper(input) == k {
 			return true
 		}
@@ -111,26 +99,16 @@ func transformNumberStringToNumberSlice(numberString string) (*[]int, error) {
 	return &result, nil
 }
 
-func getInputModeMap() *map[string]modeMapObject {
-	result := map[string]modeMapObject{
-		"AVG": {avgMode, avgCalc{}},
-		"SUM": {sumMode, sumCalc{}},
-		"MED": {medMode, medCalc{}},
-	}
-
-	return &result
-}
-
 func getInputModeString() string {
 	const separator string = ", "
 
 	var sb strings.Builder
 
 	i := 1
-	for k := range *inputModeMap {
+	for k := range inputModeFnMap {
 		sb.WriteString(k)
 
-		if i < len(*inputModeMap) {
+		if i < len(inputModeFnMap) {
 			sb.WriteString(separator)
 		}
 
@@ -140,7 +118,7 @@ func getInputModeString() string {
 	return sb.String()
 }
 
-func (sc sumCalc) calc(slice *[]int) int {
+func calcSum(slice *[]int) int {
 	var result int = 0
 
 	for _, val := range *slice {
@@ -150,17 +128,17 @@ func (sc sumCalc) calc(slice *[]int) int {
 	return result
 }
 
-func (ac avgCalc) calc(slice *[]int) int {
+func calcAvg(slice *[]int) int {
 	if len(*slice) == 0 {
 		return 0
 	}
 
-	sum := sumCalc{}.calc(slice)
+	sum := calcSum(slice)
 
 	return sum / len(*slice)
 }
 
-func (mc medCalc) calc(slice *[]int) int {
+func calcMed(slice *[]int) int {
 	var result int = 0
 
 	if len(*slice) == 0 {
@@ -172,7 +150,7 @@ func (mc medCalc) calc(slice *[]int) int {
 
 	if len(sliceCopy)%2 == 0 {
 		idx := len(sliceCopy) / 2
-		result = avgCalc{}.calc(&[]int{
+		result = calcAvg(&[]int{
 			sliceCopy[idx-1],
 			sliceCopy[idx]})
 	} else {
