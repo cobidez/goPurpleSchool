@@ -1,13 +1,9 @@
-package config
+package api
 
-import "os"
+import (
+	"bin/config"
+)
 
-type Config struct {
-	key string
-}
-
-func NewConfig() *Config {
-	return &Config{
-		key: os.Getenv("API_KEY"),
-	}
+func getKey() string {
+	return config.NewConfig().Key
 }
