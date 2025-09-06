@@ -3,11 +3,15 @@ package config
 import "os"
 
 type Config struct {
-	Key string
+	key string
 }
 
 func NewConfig() *Config {
 	return &Config{
 		key: os.Getenv("API_KEY"),
 	}
+}
+
+func (c *Config) GetKey() string {
+	return c.key
 }

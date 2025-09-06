@@ -5,5 +5,6 @@ import (
 )
 
 func getKey() string {
-	return config.NewConfig().Key
+	conf := config.NewConfig()
+	return conf.GetKey()
 }
